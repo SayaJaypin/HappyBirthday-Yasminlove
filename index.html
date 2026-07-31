@@ -1,232 +1,348 @@
 <!DOCTYPE html>
-<html lang="id" class="lenis-scroll">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#080506">
-    <meta name="description" content="Sebuah monolog tentang jarak, piksel, dan realita. Selamat Ulang Tahun, Yasmintul.">
-    <title>Untuk Yasmintul — Melampaui Batas Layar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Untuk Yasmintul - Selamat Ulang Tahun</title>
+    <meta name="theme-color" content="#020617">
     
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-
-    <!-- Dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://unpkg.com/split-type"></script>
-    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Three.js (Import Map for ES Modules) -->
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
-            }
-        }
-    </script>
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Background Effects -->
+    <div class="bg-effects">
+        <div class="aurora aurora-1"></div>
+        <div class="aurora aurora-2"></div>
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="noise-overlay"></div>
+        <div id="particles-container"></div>
+    </div>
 
-    <!-- Loading Screen -->
-    <div id="loader" class="loader">
-        <div class="loader-content">
-            <h1 class="loader-text">Menghubungkan Server Hati...</h1>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress"></div>
+    <!-- Splash Screen (Langsung Muncul Tanpa PIN) -->
+    <div id="splash-screen" style="display: flex;">
+        <div class="splash-content">
+            <div class="loader-ring"></div>
+            <h1 class="splash-text">
+                <span id="typing-text"></span><span class="cursor">|</span>
+            </h1>
+            <p class="splash-subtext" id="splash-subtext">Ada sebuah cerita perjalanan virtual yang ingin aku bagikan hari ini...</p>
+            <button id="enter-btn" class="premium-btn disabled">Buka Cerita Kita <i class="fa-solid fa-heart"></i></button>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="load-progress"></div>
             </div>
         </div>
     </div>
 
-    <!-- Music Player (I Love You - Celine Dion) -->
-    <div class="music-player" aria-label="Music Player">
-        <audio id="bg-music" src="assets/music/i_love_you.mp3" loop></audio>
-        <button id="play-btn" class="magnetic-btn" aria-label="Play Music">
-            <div class="equalizer">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
+    <!-- Floating Music Player (Mini) -->
+    <div id="music-player" class="glass-panel" style="display: none;">
+        <audio id="bgm" src="assets/music/song.mp3" loop></audio>
+        <div class="player-info">
+            <div class="vinyl-record">
+                <i class="fa-solid fa-music"></i>
             </div>
-            <span id="play-text">Putar Melodi Kita</span>
-        </button>
+            <div class="track-details">
+                <span class="track-name">I Love You - Céline Dion</span>
+                <span class="track-artist">Reica untuk Yasmintul</span>
+            </div>
+        </div>
+        <div class="player-controls">
+            <button id="play-pause-btn"><i class="fa-solid fa-play"></i></button>
+            <button id="next-btn"><i class="fa-solid fa-forward-step"></i></button>
+        </div>
+        <div class="progress-wrapper">
+            <span id="current-time">0:00</span>
+            <input type="range" id="seek-bar" value="0" min="0" max="100">
+            <span id="duration-time">0:00</span>
+        </div>
+        <div class="volume-wrapper">
+            <i class="fa-solid fa-volume-high" style="font-size: 0.6rem;"></i>
+            <input type="range" id="volume-bar" value="50" min="0" max="100">
+        </div>
     </div>
 
-    <main id="smooth-wrapper">
-        <div id="smooth-content">
-
-            <!-- Section 1: Pembuka -->
-            <section class="hero" id="hero">
-                <div class="hero-canvas-container" id="cake-canvas-container">
-                    <!-- Three.js Cake Canvas -->
-                </div>
-                <div class="hero-content">
-                    <p class="hero-subtitle reveal-text">31 Juli 2004 — Titik awal sebelum dunia maya mempertemukan kita</p>
-                    <h1 class="hero-title reveal-text">Yasmintul</h1>
-                    <button class="scroll-btn magnetic-btn reveal-text" id="scroll-down-btn" aria-label="Mulai Perjalanan">
-                        Mulai Koneksi
-                    </button>
-                </div>
-            </section>
-
-            <!-- Section 2: Menu Utama & Cerita -->
-            <section class="story-section">
-                <div class="container">
-                    <div class="prose">
-                        <p class="fade-up">Ada kalanya aku takjub pada bagaimana koneksi internet mampu mengantarkan debar jantungku melintasi jarak, langsung menujumu tanpa tersesat.</p>
-                        <p class="fade-up">Kita bertemu di sebuah dunia yang tidak bisa disentuh oleh fisik, namun segala rasa yang tumbuh di dalamnya adalah hal paling nyata yang pernah aku miliki.</p>
-                        <p class="fade-up">Dari balik monitor yang menyala di tengah kegelapan kamarku, suaramu yang terdengar melalui mikrofon selalu berhasil menjadi lagu pengantar tidur yang paling menenangkan.</p>
-                        <p class="fade-up">Mengingat hari ini di tahun 2004, semesta menyambut kehadiranmu, seorang wanita yang kelak akan mengubah cara pandangku tentang jarak dan kedekatan.</p>
-                        <p class="fade-up">Usiamu bertambah hari ini, menyadarkanku bahwa waktu yang kita habiskan di dalam ruang virtual itu adalah investasi emosional paling berharga di dunia nyata.</p>
-                        <p class="fade-up">Aku mulai menyukai rutinitasku, menunggu ikon namamu menyala terang, menandakan bahwa engkau telah hadir dan siap menjelajahi dunia bersamaku.</p>
-                        <p class="fade-up">Bukan genggaman tangan secara fisik yang menguatkanku, melainkan kehadiran avatar kita yang selalu berdiri berdampingan dalam setiap petualangan yang kita ciptakan.</p>
-                        <p class="fade-up">Kamu mengajarkanku bahwa cinta tidak melulu soal raga yang berdekatan, melainkan dua frekuensi pemikiran yang bersedia saling memahami meski terhalang layar.</p>
-                        <p class="fade-up">Jika ada hal yang ingin kubekukan, itu adalah momen saat tawamu memecah keheningan di sela-sela permainan kita, meresap langsung ke dalam hatiku.</p>
-                        <p class="fade-up">Hari ini adalah perayaan untukmu, Yasmintul, seseorang yang membuktikan bahwa keajaiban bisa bermula dari sebaris teks dan sebuah koneksi jaringan.</p>
+    <!-- Main Content -->
+    <main id="main-content" style="display: none;">
+        
+        <!-- Section: Beranda -->
+        <section id="beranda" class="section-container">
+            <div class="hero-content">
+                <div class="hero-badge" data-aos="fade-down">31 Juli 2004</div>
+                <h1 class="hero-title" data-aos="fade-up">Selamat Ulang Tahun<br><span class="highlight">Yasmintul</span></h1>
+                <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200">Hari di mana semesta menghadirkan laki-laki hebat yang mewarnai duniaku.</p>
+                
+                <div class="time-panel glass-panel" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="date-display" id="full-date">Sabtu, 31 Juli 2004</div>
+                    <div class="clock-display" id="main-clock">00:00:00</div>
+                    <div class="timezone-container">
+                        <div class="tz-box">
+                            <span class="tz-label">WIB</span>
+                            <span class="tz-time" id="wib-time">00:00</span>
+                        </div>
+                        <div class="tz-box">
+                            <span class="tz-label">WITA</span>
+                            <span class="tz-time" id="wita-time">00:00</span>
+                        </div>
+                        <div class="tz-box">
+                            <span class="tz-label">WIT</span>
+                            <span class="tz-time" id="wit-time">00:00</span>
+                        </div>
                     </div>
                 </div>
-            </section>
 
-            <!-- Section 3: Gallery Editorial Layout (5 Photos - Zero Gaps) -->
-            <section class="gallery-section">
-                <div class="container">
-                    <h2 class="section-title fade-up">Piksel yang Menyimpan Nyawa</h2>
-                    <div class="gallery-grid">
-                        <div class="img-wrap img-1 fade-up"><img src="assets/images/photo1.jpg" alt="Memori Yasmintul 1"></div>
-                        <div class="img-wrap img-2 fade-up"><img src="assets/images/photo2.jpg" alt="Memori Yasmintul 2"></div>
-                        <div class="img-wrap img-3 fade-up"><img src="assets/images/photo3.jpg" alt="Memori Yasmintul 3"></div>
-                        <div class="img-wrap img-4 fade-up"><img src="assets/images/photo4.jpg" alt="Memori Yasmintul 4"></div>
-                        <div class="img-wrap img-5 fade-up"><img src="assets/images/photo5.jpg" alt="Memori Yasmintul 5"></div>
+                <div class="countdown-panel glass-panel" data-aos="fade-up" data-aos-delay="600">
+                    <h3>Menuju Ulang Tahun Berikutnya</h3>
+                    <div class="countdown-timer">
+                        <div class="cd-box"><span id="cd-hari">00</span><label>Hari</label></div>
+                        <div class="cd-box"><span id="cd-jam">00</span><label>Jam</label></div>
+                        <div class="cd-box"><span id="cd-menit">00</span><label>Menit</label></div>
+                        <div class="cd-box"><span id="cd-detik">00</span><label>Detik</label></div>
                     </div>
+                </div>
+                
+                <div class="scroll-indicator">
+                    <span>Gulir ke bawah</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Galeri (Anti Bolong Flexbox) -->
+        <section id="galeri" class="section-container">
+            <div class="section-header">
+                <h2>Potret Virtual Kita</h2>
+                <p>Meski hanya dari layar, kebersamaan kita selalu terasa nyata.</p>
+            </div>
+            
+            <div class="masonry-gallery">
+                <!-- KOLOM KIRI -->
+                <div class="gallery-col">
+                    <div class="gallery-item">
+                        <div class="media-wrapper ratio-16-9">
+                            <img src="assets/images/foto1.jpg" alt="">
+                        </div>
+                        <p class="media-caption">Masih inget nggak awal mula kita mabar? Dari yang awalnya cuma iseng main Roblox bareng, eh malah jadi candu.</p>
+                    </div>
+
+                    <div class="gallery-item">
+                        <div class="media-wrapper ratio-9-16">
+                            <img src="assets/images/foto3.jpg" alt="">
+                        </div>
+                        <p class="media-caption">Karakter kotak-kotak kita ini saksinya. Semoga nanti nggak cuma avatar kita aja yang deketan, tapi orang aslinya juga ya.</p>
+                    </div>
+
+                    <div class="gallery-item">
+                        <div class="media-wrapper ratio-16-9">
+                            <img src="assets/images/foto5.jpg" alt="">
+                        </div>
+                        <p class="media-caption">Kapan-kapan kita jalan-jalan di dunia nyata ya cowokku. Bukan cuma muter-muter di server ini aja.</p>
+                    </div>
+                </div>
+
+                <!-- KOLOM KANAN -->
+                <div class="gallery-col">
+                    <div class="gallery-item">
+                        <div class="media-wrapper ratio-16-9">
+                            <img src="assets/images/foto2.jpg" alt="">
+                        </div>
+                        <p class="media-caption">Cowok nyebelin yang suka banget isengin aku di game, tapi selalu sukses bikin aku kangen tiap hari.</p>
+                    </div>
+
+                    <div class="gallery-item">
+                        <div class="media-wrapper ratio-16-9">
+                            <img src="assets/images/foto4.jpg" alt="">
+                        </div>
+                        <p class="media-caption">Biar jarak kita jauh, tapi tiap kali kita online dan main bareng, hariku langsung terasa sempurna banget.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Kenangan (Timeline) -->
+        <section id="kenangan" class="section-container">
+            <div class="section-header">
+                <h2>Jejak Waktu</h2>
+                <p>Bagaimana semesta menyatukan dua pemain dalam satu server.</p>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-panel">
+                        <h3>🎮 The Story of Us</h3>
+                        <p>Semuanya berawal dari sebuah server game. Sapaan singkat yang tanpa kita sadari akhirnya merubah seluruh duniaku.</p>
+                    </div>
+                </div>
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-panel">
+                        <h3>💌 The First Message</h3>
+                        <p>Dari obrolan game berlanjut ke chat pribadi. Awalnya mungkin canggung, tapi ternyata kita nyambung banget.</p>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-panel">
+                        <h3>💬 Our First Conversation</h3>
+                        <p>Mulai sering ngobrol panjang lebar. Ngomongin hal random dari A sampai Z yang entah kenapa nggak pernah ada bosennya kalau sama kamu.</p>
+                    </div>
+                </div>
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-panel">
+                        <h3>📱 The Night We Stayed Up Together</h3>
+                        <p>Rela nahan ngantuk demi main bareng kamu. Padahal mata udah mau nutup, tapi denger suaramu aja udah bikin aku betah begadang.</p>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-panel">
+                        <h3>😂 Our Endless Laughter</h3>
+                        <p>Momen konyol pas karakter kita nge-bug atau pas kamu sengaja nge-troll aku. Ketawamu itu selalu berhasil bikin aku senyum-senyum sendiri.</p>
+                    </div>
+                </div>
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-panel">
+                        <h3>🌙 Late Night Calls</h3>
+                        <p>Malam-malam panjang yang cuma diisi suara kita berdua. Suaramu itu beneran jadi penenang dan candu paling hebat buatku.</p>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-panel">
+                        <h3>❤️ The Day I Realized I Love You</h3>
+                        <p>Momen di mana aku sadar, aku udah jatuh cinta terlalu dalam sama laki-laki hebat di balik layar ini.</p>
+                    </div>
+                </div>
+                <div class="timeline-item left">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-panel">
+                        <h3>✈️ One Day We'll Meet</h3>
+                        <p>Jarak emang masih jadi musuh utama kita. Tapi aku yakin, pertemuan pertama kita nanti bakal nebus semua rasa rindu ini.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Harapan -->
+        <section id="harapan" class="section-container text-heavy">
+            <div class="section-header">
+                <h2>Doa dan Harapan</h2>
+                <p>Bait-bait permohonan yang selalu kurapalkan untuk jagoanku.</p>
+            </div>
+            <div class="prose-content glass-panel">
+                <p>Selamat ulang tahun, Yasmintul... laki-laki terhebatku.</p>
+                <p>Di usiamu yang baru ini, sejujurnya harapanku cuma satu: aku pengen lihat kamu selalu bahagia. Aku berdoa semoga senyum yang selalu aku denger dari balik mic itu, nggak pernah hilang dimakan kerasnya dunia.</p>
+                <p>Semoga Tuhan selalu memberikanmu kesehatan yang melimpah, melindungi setiap langkahmu, dan ngasih kelancaran buat semua hal baik yang lagi kamu usahain sekarang. Semoga kamu selalu dikelilingi hal-hal positif.</p>
+                <p>Aku tahu sayang, hidup kadang suka berat dan bikin capek. Kalau nanti kamu lagi ada di titik terendah, lagi pusing, atau ngerasa pengen nyerah, tolong inget ya kalau kamu nggak pernah sendirian. Walaupun ragaku jauh dari jangkauanmu, telingaku selalu siap dengerin semua keluh kesahmu.</p>
+                <p>Semoga kamu semakin percaya diri dan sadar betapa berharganya dirimu. Kamu itu laki-laki hebat, kuat, dan kebanggaan aku. Jangan pernah ngerasa kurang ya.</p>
+                <p>Dan dari sekian banyak doa baik untukmu, ada satu doa yang selalu aku semogakan tiap hari. Aku berdoa semoga jarak dan waktu bisa segera berbaik hati sama kita. Semoga semesta secepatnya ngizinin kita buat ngerayain ulang tahunmu secara langsung, duduk berdua tanpa ada layar yang menghalangi.</p>
+                <p>Semoga kebaikan selalu menyertaimu ya, cowokku. Teruslah jadi Yasmintul yang aku kenal, kesayangannya Reica.</p>
+            </div>
+        </section>
+
+        <!-- Section: Surat -->
+        <section id="surat" class="section-container text-heavy">
+            <div class="section-header">
+                <h2>Surat Untukmu</h2>
+                <p>Semua yang tak bisa terucap, kutuliskan khusus untukmu.</p>
+            </div>
+            <div class="letter-paper">
+                <p>Hai Yasmintul...</p>
+                <p>Kadang aku suka mikir sendirian, kok bisa ya? Kok bisa aku ngerasa sayang dan sepeduli ini sama cowok yang awalnya cuma kukenal dari game virtual? Seseorang yang awalnya cuma kebetulan mabar bareng di Roblox, sekarang malah jadi alasan utamaku buat semangat menjalani hari.</p>
+                <p>Hubungan kita ini unik. Kita nggak bisa tiba-tiba janjian pergi nonton, nggak bisa tiba-tiba mampir bawain makanan pas lagi sedih, apalagi pegangan tangan. Semua rindu cuma bisa dititipin lewat chat, call, dan main bareng di map favorit kita.</p>
+                <p>Tapi anehnya, justru karena hal itu aku jadi sadar betapa tulusnya perasaan ini. Aku mencintaimu bukan karena hal-hal fisik, melainkan karena caramu berbicara, caramu memperlakukanku, dan suaramu yang selalu ngasih ketenangan luar biasa buatku.</p>
+                <p>Terima kasih ya sayang udah mau bertahan. Menjalani hubungan LDR yang cuma modal layar dan kepercayaan itu pasti nggak gampang. Sering miskomunikasi, overthinking, atau capek nahan rindu. Tapi makasih banget kamu nggak pernah nyerah sama hubungan kita.</p>
+                <p>Kamu harus tahu kalau setiap denger notif darimu, hatiku selalu ikutan seneng. Dengerin kamu cerita tentang harimu, dengerin kamu ketawa, itu udah jadi bagian paling aku tunggu setiap harinya.</p>
+                <p>Maaf ya kalau selama ini aku belum bisa jadi pacar yang sempurna. Belum bisa ada di sampingmu pas kamu butuh senderan fisik. Tapi aku janji, aku bakal selalu doain yang terbaik buat kita. Aku bakal terus nunggu sampai hari di mana kita beneran bisa ketemu dan tatap-tatapan langsung.</p>
+                <p>Di hari spesialmu ini, aku berharap kamu bisa ngerasain sebesar apa rasa sayangku, meskipun perayaannya cuma lewat website ini. Simpan pesan ini ya, baca lagi kalau suatu saat nanti kamu ngerasa sedih atau sendirian.</p>
+                <p>Selamat bertambah usia, laki-laki hebatku. Tunggu aku ya, nanti kita pasti ketemu.</p>
+                <p class="signature">Sangat amat menyayangimu,<br>Reica</p>
+            </div>
+        </section>
+
+        <!-- Section: Kue (Three.js) -->
+        <section id="kue" class="section-container">
+            <div class="section-header">
+                <h2>Waktunya Merayakan</h2>
+                <p>Geser layarnya untuk memutar kue. Tiup lilinnya dan buatlah satu permohonan dalam hati.</p>
+            </div>
+            <div class="canvas-wrapper glass-panel">
+                <canvas id="cake-canvas"></canvas>
+                <div class="cake-overlay" id="cake-message">
+                    <h3>Permohonan Terkabul!</h3>
+                    <p>Semoga semua doa baikmu diaminkan oleh semesta ya, Sayang.</p>
+                </div>
+            </div>
+            <button id="blow-candle-btn" class="premium-btn">Tiup Lilin <i class="fa-solid fa-wind"></i></button>
+        </section>
+
+        <!-- Section: Secret Gift -->
+        <section id="gift" class="section-container">
+            <div class="section-header">
+                <h2>Kado Terakhir</h2>
+                <p>Sebuah kejutan kecil yang aku siapkan khusus untuk cowokku.</p>
+            </div>
+            
+            <button id="open-gift-btn" class="premium-btn gold-btn">Buka Kado <i class="fa-solid fa-gift"></i></button>
+            
+            <div id="gift-reveal-area" style="display: none;">
+                <div class="canvas-wrapper gift-wrapper glass-panel">
+                    <canvas id="gift-canvas"></canvas>
+                </div>
+                
+                <div class="final-letter glass-panel">
+                    <h3>Teruntuk Cinta Virtualku yang Menjadi Nyata</h3>
+                    <p>Yasmintul kesayanganku...</p>
+                    <p>Waktu kotak ini terbuka, aku pengen kamu tahu kalau kado yang paling berharga bukanlah apa yang ada di dalamnya, melainkan sebesar apa niat dan ketulusanku buat ngebahagiain kamu di hari ini.</p>
+                    <p>Dunia game ini mungkin cuma virtual, tapi perasaanku ke kamu adalah hal paling nyata yang pernah aku miliki. Kamu adalah tujuan terakhirku setiap kali menutup hari.</p>
+                    <p>Sabar sedikit lagi ya ngadepin jaraknya. Biarkan sekarang server game yang mempertemukan kita, tapi aku pastikan nanti takdir yang akan nyatuin kita di dunia nyata.</p>
+                    <p>Aku menyayangimu lebih dari yang bisa diketik oleh *keyboard*, dan lebih dari yang bisa aku ucapin lewat *mic*.</p>
                     
-                    <div class="prose mt-large">
-                        <p class="fade-up">Tangkapan layar ini bukan sekadar gambar avatar yang tersusun dari blok-blok digital tanpa nyawa.</p>
-                        <p class="fade-up">Di balik setiap kotak dan warna dunia Roblox yang kita jalani, tersimpan rekaman memori tentang perbincangan mendalam yang kita bagi hingga larut malam.</p>
-                        <p class="fade-up">Orang lain mungkin hanya melihat karakter permainan, namun aku melihat caramu melompat, berlari, dan menungguku dengan penuh kesabaran.</p>
-                        <p class="fade-up">Karakter kita yang saling berhadapan di layar itu adalah representasi dari jiwa kita yang saling mencari kenyamanan satu sama lain.</p>
-                        <p class="fade-up">Meskipun wujud kita di sana dibatasi oleh piksel, cinta yang aku rasakan setiap kali melihat namamu di atas karaktermu adalah cinta yang sangat membumi.</p>
-                        <p class="fade-up">Ada kalanya layar membeku sesaat, namun debaranku untukmu tidak pernah mengalami gangguan sinyal sedikit pun.</p>
-                        <p class="fade-up">Aku menyimpan setiap gambar ini dengan sangat rapi, mengabadikan setiap momen di mana kita berhasil menciptakan kebahagiaan kita sendiri dari nol.</p>
-                        <p class="fade-up">Visual ini adalah saksi bisu bagaimana kita menolak menyerah pada keterbatasan jarak.</p>
-                    </div>
+                    <p style="text-align: center; text-indent: 0; margin-top: 40px; margin-bottom: 30px; font-family: var(--font-heading); font-size: 1.25rem; font-style: italic; color: var(--c-primary);">
+                        I love you to the moon and back. Laki-laki hebatnya Reica. <i class="fa-solid fa-heart" style="color: #E11D48; margin-left: 5px;"></i>
+                    </p>
+
+                    <button id="virtual-hug-btn" class="premium-btn heart-btn" style="margin: 0 auto; display: flex;">Peluk Online <i class="fa-solid fa-heart"></i></button>
                 </div>
-            </section>
-
-            <!-- Section 4: Timeline Parallax -->
-            <section class="timeline-section">
-                <div class="container">
-                    <div class="timeline-line"></div>
-                    <div class="timeline-items">
-                        
-                        <div class="timeline-item left">
-                            <div class="timeline-dot"></div>
-                            <div class="glass-card fade-up">
-                                <p>Awalnya, kita hanyalah dua nama pengguna asing yang secara kebetulan dijatuhkan oleh takdir pada satu server yang sama.</p>
-                                <p>Sebuah sapaan singkat di kolom obrolan perlahan berkembang menjadi percakapan panjang yang menyita seluruh fokusku padamu.</p>
-                                <p>Tanpa kusadari, aku mulai merindukan suaramu lebih dari aku menikmati permainan itu sendiri.</p>
-                            </div>
-                        </div>
-
-                        <div class="timeline-item right">
-                            <div class="timeline-dot"></div>
-                            <div class="glass-card fade-up">
-                                <p>Menghabiskan waktu berjam-jam membangun struktur di dunia virtual, kita ternyata sedang membangun fondasi kepercayaan yang kuat di dunia nyata.</p>
-                                <p>Ada malam-malam di mana kita hanya membiarkan karakter kita duduk terdiam di dalam game, sementara kita berbagi cerita tentang keluh kesah dunia nyata.</p>
-                                <p>Engkau mengubah ruang yang tadinya hanya sebatas permainan menjadi tempat pelarian yang paling aman untuk segala penatku.</p>
-                            </div>
-                        </div>
-
-                        <div class="timeline-item left">
-                            <div class="timeline-dot"></div>
-                            <div class="glass-card fade-up">
-                                <p>Aku mengagumi caramu mendengarkan, bagaimana jeda suaramu di seberang sana selalu memberiku kepastian bahwa aku tidak dibiarkan sendiri.</p>
-                                <p>Bahkan ketika layar kita harus dimatikan dan kita kembali ke kehidupan masing-masing, esensimu tetap tertinggal di kepalaku.</p>
-                                <p>Jarak geografis di antara kita seolah menjadi tidak relevan saat aku menyadari bahwa hati kita memiliki koordinat yang persis sama.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="timeline-item right">
-                            <div class="timeline-dot"></div>
-                            <div class="glass-card fade-up">
-                                <p>Layar monitor ini mungkin memisahkan raga kita untuk sementara, namun ia tidak akan pernah berhasil menciptakan spasi di antara jiwa kita.</p>
-                                <p>Melihat hari ini, aku menyadari bahwa perasaanku padamu telah tumbuh melewati batas-batas kabel dan jaringan nirkabel.</p>
-                                <p>Aku menantikan hari di mana resolusi layar berubah menjadi realita, di mana tatapan virtual ini akhirnya akan saling bersirobok secara langsung.</p>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section 5: Pertengahan - Kartu Cinta -->
-            <section class="cards-section">
-                <div class="container">
-                    <h2 class="section-title text-center fade-up">Tiga Janji di Balik Layar</h2>
-                    <div class="cards-grid">
-                        <div class="glass-panel fade-up">
-                            <p>Aku berjanji akan selalu login dan siap menjadi rumah untukmu kembali, mendengarkan segala lelahmu dari balik headset, dan memelukmu lewat kata-kata.</p>
-                            <p>Tidak peduli seburuk apa pun dunia nyata memperlakukanmu hari itu, engkau akan selalu memiliki aku yang menunggu di ujung koneksi ini.</p>
-                        </div>
-                        <div class="glass-panel fade-up mt-offset">
-                            <p>Meskipun kisah kita dibangun di atas server dan baris kode, janjiku padamu kutulis dengan tinta realita yang tak akan terhapus oleh waktu.</p>
-                            <p>Aku akan terus bersabar, mengumpulkan rindu demi rindu, hingga tiba saatnya kita tidak perlu lagi mematikan panggilan sebelum tertidur.</p>
-                        </div>
-                        <div class="glass-panel fade-up">
-                            <p>Aku bersumpah untuk menjadikanmu tujuanku, menunggu dengan penuh harap hari di mana aku bisa memindahkan segala janji virtual ini ke dalam genggaman tanganmu secara langsung.</p>
-                            <p>Kesetiaanku padamu tidak akan terputus, ia akan terus mengalir tanpa peduli seberapa jauh jarak fisik membentang di antara kita.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section 6: Penutup & Transisi ke Secret Gift -->
-            <section class="closing-section">
-                <div class="container text-center prose">
-                    <p class="fade-up">Semakin banyak waktu berlalu, ilusi tentang jarak memudar, menyisakan sebuah kenyataan bahwa aku sungguh-sungguh mencintaimu.</p>
-                    <p class="fade-up">Yasmintul, kehadiranmu di duniaku membuktikan bahwa takdir tidak pernah kehabisan cara yang unik untuk menyatukan dua manusia.</p>
-                    <p class="fade-up">Terima kasih telah menemani malam-malamku, memberikan warna pada hari-hari yang sebelumnya terasa biasa saja.</p>
-                    <p class="fade-up">Dari sekian banyak server dan jutaan kemungkinan di luar sana, aku bersyukur hatiku memutuskan untuk berhenti di depanmu.</p>
-                    <p class="fade-up">Dunia virtual mempertemukan kita, namun dunia nyata yang kelak akan menjadi saksi bagaimana rindu ini akhirnya menemukan tuannya.</p>
-                    <p class="fade-up">Biar waktu yang bekerja menyelesaikan tugasnya mengikis jarak, sementara tugasku adalah memastikan hatiku tetap terpaut padamu.</p>
-                    <p class="fade-up">Rayakanlah bertambahnya usiamu ini dengan sebuah senyum, karena di balik layar ini, ada aku yang selalu merayakan keberadaanmu.</p>
-                </div>
-
-                <div class="gift-trigger-container fade-up">
-                    <button class="gift-btn magnetic-btn" id="open-gift-btn" aria-label="Buka Hadiah Rahasia">
-                        <span class="btn-text">Sentuh Layar Ini</span>
-                    </button>
-                </div>
-            </section>
-
-        </div>
+            </div>
+        </section>
+        
+        <div style="height: 120px;"></div>
     </main>
 
-    <!-- Section 7: Secret Gift (Absolute Overlay) -->
-    <section class="secret-gift-overlay" id="secret-gift">
-        <canvas id="confetti-canvas"></canvas>
-        <div id="love-canvas-container"></div>
-        <div class="secret-content">
-            <div class="romantic-letter prose">
-                <p class="letter-text">Sebuah persembahan akhir untukmu yang sedang merayakan hari lahir, Yasmintul.</p>
-                <p class="letter-text">Di ujung halaman ini, setelah semua kata yang kurangkai, aku hanya ingin kau menyadari satu kebenaran mutlak.</p>
-                <p class="letter-text">Bahwa tidak ada satu pun dari perasaanku yang bersifat sementara atau maya, semuanya nyata dan berakar kuat di dalam dadaku.</p>
-                <p class="letter-text">Aku tidak pernah menyesali sedetik pun waktu yang kita habiskan dari balik layar, karena darisanalah aku belajar mencintai jiwa seseorang secara murni.</p>
-                <p class="letter-text">Setiap notifikasi darimu selalu berhasil menaikkan ritme jantungku, membuktikan betapa besarnya kendalimu atas suasana hatiku.</p>
-                <p class="letter-text">Tolong, jangan pernah membiarkan jarak membuatmu merasa bahwa kau kurang dihargai, karena kau selalu menempati urutan pertama di hidupku.</p>
-                <p class="letter-text">Tetaplah menjadi Yasmintul yang ceria, yang tawanya paling kutunggu-tunggu mengalun merdu dari balik headset-ku setiap malam.</p>
-                <p class="letter-text">Semoga di usiamu yang baru ini, semesta bekerja sedikit lebih cepat untuk mempertemukan kita dalam dimensi yang tidak membutuhkan jaringan internet.</p>
-                <p class="letter-text">Selamat Ulang Tahun, perempuanku. Aku menunggumu, merindukanmu, dan mencintaimu lebih dari apa pun yang mampu kau bayangkan.</p>
-                <div class="letter-signature letter-text">
-                    <p>Selalu ada di frekuensi yang sama,</p>
-                    <p class="signature-name">Reica</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- Bottom Navigation -->
+    <nav id="bottom-nav" class="glass-nav" style="display: none;">
+        <ul>
+            <li><a href="#beranda" class="active"><i class="fa-solid fa-house"></i><span>Beranda</span></a></li>
+            <li><a href="#galeri"><i class="fa-solid fa-images"></i><span>Galeri</span></a></li>
+            <li><a href="#kenangan"><i class="fa-solid fa-clock-rotate-left"></i><span>Timeline</span></a></li>
+            <li><a href="#harapan"><i class="fa-solid fa-star"></i><span>Harapan</span></a></li>
+            <li><a href="#surat"><i class="fa-solid fa-envelope"></i><span>Surat</span></a></li>
+            <li><a href="#gift"><i class="fa-solid fa-gift"></i><span>Kado</span></a></li>
+        </ul>
+    </nav>
 
-    <!-- Main Logic -->
-    <script type="module" src="script.js"></script>
+    <!-- Fullscreen Hug Animation Container -->
+    <div id="hug-overlay"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script src="script.js"></script>
 </body>
 </html>
